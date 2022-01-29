@@ -1,6 +1,9 @@
 import os
 import time
+import json
 import asyncio
+from unittest import result
+import requests
 from tracemalloc import start
 from alphabet import Alphabet
 
@@ -16,14 +19,18 @@ from user import User
 from alphabet import Alphabet
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+TENOR_TOKEN = os.getenv('TENOR_TOKEN')
 
 client = commands.Bot(command_prefix='!')
 
+# TENOR GLOBAL VARIABLES
+lmt = 2
+
 # GLOBAL VARIABLES
-word_of_the_day = "unlawful"
+word_of_the_day = "crocodile"
 game_over = True
-word_length = 8
+word_length = len(word_of_the_day)
 num_guesses = 3
 guess_history = [] # Array of array of letters
 users = {}
@@ -38,7 +45,8 @@ async def on_ready():
 
     # CREATE ASSIGNABLE CHANNEL ID LATER
     global channel
-    channel = client.get_channel(935648191959933002)
+    channel = client.get_channel(936844892838178816)
+    
 
 
 @client.command()
@@ -51,7 +59,7 @@ async def guess(ctx, arg):
 
             # Check for correct length
             if len(arg) != word_length:
-                await channel.send("Wrong length")
+                await channel.send("You idiot stupid idiot moron little stupid child it's not")
                 return
 
             # Check that word exists
@@ -61,8 +69,16 @@ async def guess(ctx, arg):
 
             # Case if word is correct
             if arg == correct_word.word_string:
-                await channel.send("You guessed the word!")
+                green_square_string = ":green_square:" * word_length
+                final_print = ""
+                for letter in word_of_the_day:
+                    final_print += letter + "     "
+                
+                await channel.send("**" + str(ctx.author) + " guessed the word!!**\n" + green_square_string + "\n" + final_print) 
                 change_game_over_state(True)
+
+                # Get Tenor GIF for win
+                await send_gif()
                 return
 
             # Check if user had guesses remaining
@@ -87,6 +103,33 @@ async def guess(ctx, arg):
 
             else:
                 await channel.send("No more guesses remaining!")
+    else:
+        await not_registered_msg(ctx)
+
+
+"""
+Show correct letters in the right spot
+"""
+@client.command()
+async def correct(ctx):
+    if is_registered(ctx.author.id):
+        correct_word.reset_matched()
+        print(len(correct_word.word))
+        for guess in guess_history:
+            for i in range(0, len(guess["guess"])):
+                if guess["guess"][i].status == LetterStatus.GREEN:
+                    correct_word.word[i].status = LetterStatus.GREEN
+        
+        result_string = ""
+        
+        for letter in correct_word.word:
+            if letter.status == LetterStatus.GREEN:
+                result_string += ":regional_indicator_" + letter.char + ":"
+            else:
+                result_string += ":white_square_button:"
+        
+        await channel.send("Word with only green letters so far:\n" + result_string)
+
     else:
         await not_registered_msg(ctx)
 
@@ -133,9 +176,11 @@ Prints history of guessed words for the day
 async def history(ctx):
     if is_registered(ctx.author.id):
         if len(guess_history) > 0:
+            print_result = ""
             for guess in guess_history:
-                await channel.send("***" + guess['author'] + "*** guessed:\n")
-                await channel.send(Word.print(guess['guess']))
+                print_result += "***" + guess['author'] + "*** guessed:\n"
+                print_result += Word.print(guess['guess']) + "\n"
+            await channel.send(print_result)
         else:
             await channel.send("No guesses yet!")
     else:
@@ -195,6 +240,18 @@ async def background_task():
         await asyncio.sleep(50000)
 
 
+async def send_gif():
+    response = requests.get("https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (word_of_the_day, TENOR_TOKEN, lmt))
+    if response.status_code == 200:
+        # load the GIFs using the urls for the smaller GIF sizes
+        top_8gifs = json.loads(response.content)
+        embed = discord.Embed()
+        gif_url = top_8gifs['results'][0]['media'][0]['gif']['url']
+        embed.set_image(url=gif_url)
+        await channel.send(embed=embed)
+
+
+
 def update_alphabet(return_word):
     for letter in return_word:
         # If letter is already black, change it to whatever the guess color was
@@ -237,4 +294,4 @@ def change_game_over_state(val):
     #     seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
     #     await asyncio.sleep(seconds)   # Sleep until tomorrow and then the loop will start a new iteration
 
-client.run(TOKEN)
+client.run(DISCORD_TOKEN)
