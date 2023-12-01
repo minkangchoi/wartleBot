@@ -11,4 +11,3 @@ class Alphabet:
     def reset(self):
         for key in self.alphabet_dict:
             self.alphabet_dict[key] = LetterStatus.BLACK
-    

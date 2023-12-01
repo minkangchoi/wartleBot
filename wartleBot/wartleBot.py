@@ -26,6 +26,8 @@ class WartleBot(commands.Cog):
             self.games[ctx.guild.id] = Game(ctx.guild.id, ctx.channel, self, self.TENOR_TOKEN)
         # If game is not already up
         if self.games[ctx.guild.id].game_over:
+                
+
             await self.games[ctx.guild.id].start_game(arg)
         # Else dont start another game
         else:
@@ -34,6 +36,19 @@ class WartleBot(commands.Cog):
     """
     Turn friendly mode on or off for the guild
     """
+    @commands.command()
+    async def friendly(self, ctx, arg):
+        if self.game_exists(ctx):
+            if arg == "on":
+                self.games[ctx.guild.id].friendly_mode = True
+                await ctx.channel.send("Friendly mode has been turned **on**")
+            elif arg == "off":
+                self.games[ctx.guild.id].friendly_mode = False
+                await ctx.channel.send("Friendly mode has been turned **off**")
+            else:
+                await ctx.channel.send("Useage: `!friendly on` or `!friendly off`")
+        else:
+            await ctx.channel.send("Wait for a game to start first!")
 
     """
     Command to guess a word
@@ -117,7 +132,7 @@ class WartleBot(commands.Cog):
     """
     async def game_is_over(self, ctx, game):
         if game.game_over:
-            await self.channels[ctx.guild.id].send("The game's over buddy wait for the next one")
+            await self.channels[ctx.guild.id].send("The game is over, please wait for the next one to start")
             return True
         return False
 

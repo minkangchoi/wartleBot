@@ -32,4 +32,3 @@ class Help(commands.Cog):
             ":black_large_square:: Letter has not been guessed yet\n\n"
             "For list of commands, use `!coms`."
         )
-

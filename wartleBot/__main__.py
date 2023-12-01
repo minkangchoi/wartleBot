@@ -39,8 +39,6 @@ def main():
     bot.add_cog(Help())
     bot.add_cog(CommandErrHandler(bot))
 
-
-
     bot.run(DISCORD_TOKEN)
 
 

@@ -34,6 +34,5 @@ class Setup(commands.Cog):
     @commands.command()
     async def help(self, ctx):
         await ctx.channel.send(
-            "**COMMANDS**:\n" + 
-            "wip"
+            "Use at `!rules` and `!coms` for more info!"
         )

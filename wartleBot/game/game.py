@@ -7,6 +7,7 @@ from .player import Player
 from .word import Word
 from .letter import LetterStatus
 from .alphabet import Alphabet
+from .leaderboard import Leaderboard
 
 class Game:
 
@@ -29,7 +30,7 @@ class Game:
         self.channel = channel 
 
         # Game Setup Variables
-        self.friendly_mode = False
+        self.friendly_mode = True
         self.correct_word = ""
         self.correct_word_object = None
         self.word_length = 9
@@ -39,6 +40,8 @@ class Game:
         self.alphabet = None
         self.alphabet = Alphabet()
         self.game_over = True
+        
+        self.leaderboard = Leaderboard(guild_id)
 
 
     """
@@ -47,6 +50,9 @@ class Game:
     async def start_game(self, word_length):
         self.game_over = False
         self.players.clear()
+        self.guess_history.clear()
+        self.words_dict.clear()
+        self.alphabet.reset()
         self.word_length = int(word_length)
 
         # Initialize word dictionary with words of string length
@@ -87,7 +93,7 @@ class Game:
             # Check for correct length
             if len(arg) != self.word_length:
                 if(self.friendly_mode):
-                    await self.print_to_channel("Word must be " + self.word_length + " letters longs!")
+                    await self.print_to_channel("Word must be " + str(self.word_length) + " letters long!")
                 else:
                     await self.print_to_channel("You idiot stupid idiot moron little stupid child it's not " + str(self.word_length) + " letters long")
                 return
