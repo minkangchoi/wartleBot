@@ -34,23 +34,6 @@ class WartleBot(commands.Cog):
             await self.channels[ctx.guild.id].send("A game is already running!")
 
     """
-    Turn friendly mode on or off for the guild
-    """
-    @commands.command()
-    async def friendly(self, ctx, arg):
-        if self.game_exists(ctx):
-            if arg == "on":
-                self.games[ctx.guild.id].friendly_mode = True
-                await ctx.channel.send("Friendly mode has been turned **on**")
-            elif arg == "off":
-                self.games[ctx.guild.id].friendly_mode = False
-                await ctx.channel.send("Friendly mode has been turned **off**")
-            else:
-                await ctx.channel.send("Useage: `!friendly on` or `!friendly off`")
-        else:
-            await ctx.channel.send("Wait for a game to start first!")
-
-    """
     Command to guess a word
     """
     @commands.command(aliases=["g"])

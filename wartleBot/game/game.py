@@ -30,7 +30,6 @@ class Game:
         self.channel = channel 
 
         # Game Setup Variables
-        self.friendly_mode = True
         self.correct_word = ""
         self.correct_word_object = None
         self.word_length = 9
@@ -92,19 +91,12 @@ class Game:
 
             # Check for correct length
             if len(arg) != self.word_length:
-                if(self.friendly_mode):
-                    await self.print_to_channel("Word must be " + str(self.word_length) + " letters long!")
-                else:
-                    await self.print_to_channel("You idiot stupid idiot moron little stupid child it's not " + str(self.word_length) + " letters long")
+                await self.print_to_channel("Word must be " + str(self.word_length) + " letters long!")
                 return
 
             # Check that word exists
             if not self.word_exists(arg):
-                if(self.friendly_mode):
-                    await self.print_to_channel(str(arg) + " is not a real word!")
-                else:
-                    await self.print_to_channel(str(arg) + " is not a real word you stupid idiot stupid moron stupid little moron child ")
-                return
+                await self.print_to_channel(str(arg) + " is not a real word!")
 
             # Case if word is correct
             if arg == self.correct_word:
@@ -147,10 +139,8 @@ class Game:
             await self.print_to_channel("**" + str(ctx.author) + "** joined the game!\nYou have **" + str(self.num_guesses) + "** chances to guess the word")
             self.players[ctx.author.id] = Player(ctx.author.id, self.num_guesses)
         else:
-            if self.friendly_mode:
-                await self.print_to_channel("You've already joined the game!")
-            else:
-                await self.print_to_channel("You already joined you naughty boy :hot_face:")
+            await self.print_to_channel("You've already joined the game!")
+
 
     """
     Command to return number of guesses remaining for user
@@ -276,10 +266,7 @@ class Game:
     """
     async def has_joined(self, ctx):
         if not self.players.get(ctx.author.id):
-            if self.friendly_mode:
-                await self.channel.send("Join the game first using `!join` or `!j`")
-            else:
-                await self.channel.send('Join for the game by using !join, baka >///<')
+            await self.channel.send("Join the game first using `!join` or `!j`")
             return False
         return True
         
